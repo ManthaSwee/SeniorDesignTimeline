@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="http://www.html5canvastutorials.com/libraries/three.min.js"></script>
+    <script defer="defer">
+      // revolutions per second
+      var angularSpeed = 0.2; 
+      var lastTime = 0;
+ 
+      // this function is executed on each animation frame
+      function animate(){
+        // update
+        var time = (new Date()).getTime();
+        var timeDiff = time - lastTime;
+        var angleChange = angularSpeed * timeDiff * 2 * Math.PI / 1000;
+        cylinder.rotation.x += angleChange;
+        lastTime = time;
+ 
+        // render
+        renderer.render(scene, camera);
+ 
+        // request new frame
+        requestAnimationFrame(function(){
+            animate();
+        });
+      }
+ 
+      // renderer
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+ 
+      // camera
+      var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.z = 700;
+ 
+      // scene
+      var scene = new THREE.Scene();
+                
+      // cylinder
+      // API: THREE.CylinderGeometry(bottomRadius, topRadius, height, segmentsRadius, segmentsHeight)
+      var cylinderArray = [];
+      for(var i = 0; i < 10; i++){
+        var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(100, 100, 400, 20, 20, false), new THREE.MeshNormalMaterial());
+        cylinder.overdraw = true;
+        scene.add(cylinder);
+      }
+ 
+      // start animation
+      animate();
+    </script>
+  </body>
+</html>
