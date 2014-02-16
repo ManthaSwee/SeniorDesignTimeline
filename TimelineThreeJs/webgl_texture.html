@@ -22,7 +22,9 @@
         var time = (new Date()).getTime();
         var timeDiff = time - lastTime;
         var angleChange = angularSpeed * timeDiff * 2 * Math.PI / 1000;
-        cylinder.rotation.x += angleChange;
+        for(var i = 0; i < cylinderArray.length; i++){
+          cylinderArray[i].rotation.x += angleChange;
+        }
         lastTime = time;
  
         // render
@@ -49,10 +51,14 @@
       // cylinder
       // API: THREE.CylinderGeometry(bottomRadius, topRadius, height, segmentsRadius, segmentsHeight)
       var cylinderArray = [];
+      var distX = -450;
       for(var i = 0; i < 10; i++){
-        var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(100, 100, 400, 20, 20, false), new THREE.MeshNormalMaterial());
+        var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
         cylinder.overdraw = true;
         scene.add(cylinder);
+        cylinderArray[i] = cylinder;
+        cylinder.applyMatrix( new THREE.Matrix4().makeTranslation( distX, 0, 0));
+        distX+=100;
       }
  
       // start animation
