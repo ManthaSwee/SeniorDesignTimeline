@@ -1,62 +1,78 @@
 //needed for document.body to load
 window.onload = function() {
-      // revolutions per second
-      var angularSpeed = 0.2; 
-      var lastTime = 0;
-      var $network = $("#network");
- 
-      // this function is executed on each animation frame
-      function animate(){
-        // update
-        var time = (new Date()).getTime();
-        var timeDiff = time - lastTime;
-        var angleChange = angularSpeed * timeDiff * 2 * Math.PI / 1000;
-        cylinder.rotation.x += angleChange;
-        lastTime = time;
- 
-        // render
-        renderer.render(scene, camera);
- 
-        // request new frame
-        requestAnimationFrame(function(){
-            animate();
-        });
-      }
- 
-      // renderer
-      var renderer = new THREE.WebGLRenderer( {
-                         canvas: document.getElementById("network"),
-                         antialias: true
-                     } );
-      renderer.setSize($network.width(), $network.height());
- 
-      // camera
-      var camera = new THREE.PerspectiveCamera(45, $network.width() / $network.height(), 1, 1000);
-      camera.position.z = 700;
- 
-      // scene
-      var scene = new THREE.Scene();
-                
-      // cylinder
-      // API: THREE.CylinderGeometry(bottomRadius, topRadius, height, segmentsRadius, segmentsHeight)
-      var distX = -450;
+  if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-      var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
-      cylinder.overdraw = true;
-      scene.add(cylinder);
-      
-      for(var i = 0; i < 10; i++){
-        var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
-        cylinderChild.overdraw = true;
-        cylinder.add(cylinderChild);
-        cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( distX, 0, 0));
-        distX+=100;
-      }
- 
-      // start animation
-      animate();
+  var camera, controls, scene, renderer;
+  var $network = $('#network');
+
+  init();
+  animate();
+
+  function init() {
+    camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 1000 );
+    camera.position.z = 700;
+
+    controls = new THREE.TrackballControls( camera );
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan = false;
+
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+
+    controls.keys = [ 65, 83, 68 ];
+    controls.addEventListener( 'change', render );
+
+    // world
+    scene = new THREE.Scene();
+
+    var angle = 0;
+
+    var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
+    cylinder.overdraw = true;
+    scene.add(cylinder);
+
+    for(var i = 0; i < 10; i++){
+      var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
+      cylinderChild.overdraw = true;
+      cylinder.add(cylinderChild);
+      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 100, 0, 0));
+      cylinderChild.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
+      angle += 36;
+    }
+
+    // renderer
+    renderer = new THREE.WebGLRenderer( { 
+     alpha: true,
+     canvas: document.getElementById('network'),
+     antialias: true } );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    window.addEventListener( 'resize', onWindowResize, false );
+  }
+
+  function render() {
+    renderer.render( scene, camera );
+  }
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    controls.handleResize();
+
+    render();
+  }
+
+  function animate() {
+    requestAnimationFrame( animate );
+    controls.update();
+  }
 }
-
 
 
 
