@@ -73,14 +73,31 @@ footer {
     left: 316px;
     position: relative;
     top: -158px;
-    background-color: pink;
+    background-color: #222;
 }
 
 #searchbar {
     position: relative;
     top: -43px;
     height: 40px;
-    background-color: #aaa;
+    background-color: #222;
+}
+
+#mag-glass {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: 5px;
+    left: 5px;
+    background-color: #3c3c3c;
+}
+
+input {
+    height: 25px;
+    width: calc(100% - 50px);
+    left: 40px;
+    top: -25px;
+    position: relative;
 }
 
 button {
