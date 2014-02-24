@@ -31,7 +31,7 @@ footer {
 }
 
 #user {
-    background-color: #222;
+    background-color: #4f4f4f;
     height: 75px;
     width: 75px;
     bottom: 30px;
@@ -42,7 +42,7 @@ footer {
 #user-info {
     width: 217px;
     height: 100px;
-    background-color: #222;
+    background-color: #4f4f4f;
     position: relative;
     left: 83px;
 }
@@ -73,10 +73,11 @@ footer {
     left: 316px;
     position: relative;
     top: -158px;
-    background-color: #222;
+    background-color: #4f4f4f;
 }
 
 #searchbar {
+    display: none;
     position: relative;
     top: -43px;
     height: 40px;
@@ -89,7 +90,7 @@ footer {
     position: relative;
     top: 5px;
     left: 5px;
-    background-color: #3c3c3c;
+    background-color: #4f4f4f;
 }
 
 input {
@@ -107,3 +108,12 @@ button {
 button:focus{
     outline: none;
 }
+
+#small-view-3D {
+    display: none;
+}
+
+#friendlist {
+    display: none;
+}
+
