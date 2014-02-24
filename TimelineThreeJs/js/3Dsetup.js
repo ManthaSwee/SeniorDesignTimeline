@@ -2,17 +2,23 @@
 window.onload = function() {
   if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-  var camera, controls, scene, renderer;
+  var camera, controls, scene, renderer, container;
+  var WIDTH = window.innerWidth;
+  var HEIGHT = (window.innerHeight - 175) + 2;
   var $network = $('#network');
 
   init();
   animate();
 
   function init() {
-    camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 1000 );
+    camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 2000 );
     camera.position.z = 700;
+    camera.aspect = WIDTH / HEIGHT;
+    camera.updateProjectionMatrix();
+    
+    container = document.getElementById( 'container' );
 
-    controls = new THREE.TrackballControls( camera );
+    controls = new THREE.TrackballControls( camera, container );
     controls.rotateSpeed = 1.0;
     controls.zoomSpeed = 1.2;
     controls.panSpeed = 0.8;
@@ -35,7 +41,7 @@ window.onload = function() {
     cylinder.overdraw = true;
     scene.add(cylinder);
 
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < 11; i++){
       var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
       cylinderChild.overdraw = true;
       cylinder.add(cylinderChild);
@@ -49,7 +55,8 @@ window.onload = function() {
      alpha: true,
      canvas: document.getElementById('network'),
      antialias: true } );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( WIDTH, HEIGHT );
+    renderer.setClearColor( 0x222222, 1);
     window.addEventListener( 'resize', onWindowResize, false );
   }
 
@@ -58,10 +65,12 @@ window.onload = function() {
   }
 
   function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    WIDTH = window.innerWidth;
+    HEIGHT = (window.innerHeight - 175) + 2;
+    camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( WIDTH, HEIGHT );
 
     controls.handleResize();
 
