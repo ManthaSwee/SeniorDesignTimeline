@@ -1,6 +1,7 @@
 $( document ).ready(function() {
     var bar = false;
 
+
     $("button").click(function(event) {
        var myClass = $(this).attr("class");
        //show or hide the searchbar
@@ -22,8 +23,10 @@ $( document ).ready(function() {
     function showSearchBar(show){
         if(show){
             $("#searchbar").show();
+            $("#friendlist").show();
         } else {
             $("#searchbar").hide();
+            $("#friendlist").hide();
         }
     }
 
@@ -39,5 +42,17 @@ $( document ).ready(function() {
         default:  document.write("Unknown grade<br />")
         }
     }
+
+    $('#friendlist').on('click', function(){
+      var names = [];
+       $('input:checked').each(function() {
+           names.push($(this).parent().text());
+     });
+       console.log(names); 
+    });
+
+$(function(){
+$('body').fadeIn();
+});
 
 });
