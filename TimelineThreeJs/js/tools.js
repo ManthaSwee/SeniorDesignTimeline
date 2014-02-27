@@ -1,25 +1,28 @@
 $( document ).ready(function() {
-    var bar = false;
+    var state = 'b';
+    var currentlyCheckedFriends = [];
 
-
+    //on button click, set searchbar state
     $("button").click(function(event) {
-       var myClass = $(this).attr("class");
-       //show or hide the searchbar
-       if (myClass === 'nobar') {
-            showSearchBar(false);
-            bar = false;
-       } else {
-            if (!bar) {
-                showSearchBar(true);
-                bar = true;
-            } else {
+        var newState = event.target.id;
+        if(newState === state){
+            $("#searchbar").toggle();
+        } else {
+            state = newState;
+            var myClass = $(this).attr("class");
+           if (myClass === 'nobar') {
                 showSearchBar(false);
                 bar = false;
-            }        
-       }
-       setButtonState(event.target.id);
+                showAlternateViews(true);
+           } else {
+                showSearchBar(true);
+                bar = true;
+                showAlternateViews(false);     
+           }
+   }
     });
 
+    //handles the viewport for friendlist
     function showSearchBar(show){
         if(show){
             $("#searchbar").show();
@@ -30,6 +33,15 @@ $( document ).ready(function() {
         }
     }
 
+    function showAlternateViews(show){
+        if(show){
+            $('#small-view-3D').show();
+        } else {
+            $('#small-view-3D').hide();
+        }
+    }
+
+    //changes the UI based on button state
     function setButtonState(id){
         switch (id)
         {
@@ -39,20 +51,17 @@ $( document ).ready(function() {
                 break;
         case 'c': 
                 break;
-        default:  document.write("Unknown grade<br />")
+        default:  console.log("Unknown button pressed, see tools.js");
         }
     }
 
+    //keep track of which friends are checked
     $('#friendlist').on('click', function(){
       var names = [];
        $('input:checked').each(function() {
            names.push($(this).parent().text());
      });
-       console.log(names); 
+       currentlyCheckedFriends = names;
     });
-
-$(function(){
-$('body').fadeIn();
-});
 
 });

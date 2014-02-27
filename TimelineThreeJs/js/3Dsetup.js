@@ -1,5 +1,3 @@
-//needed for document.body to load
-window.onload = function() {
   if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
   var camera, controls, scene, renderer, container;
@@ -7,11 +5,15 @@ window.onload = function() {
   var HEIGHT = (window.innerHeight - 175) + 2;
   var $network = $('#network');
 
-  init();
-  animate();
+  function setUpWithFriends(friendlist){
+    console.log(friendlist);
+    init(friendlist);
+    animate();
+  }
 
-  function init() {
-    camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 2000 );
+  function init(friendlist) {
+    var num_friends = Object.keys(friendlist).length;
+    camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 10000 );
     camera.position.z = 700;
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
@@ -35,19 +37,21 @@ window.onload = function() {
     // world
     scene = new THREE.Scene();
 
-    var angle = 0;
+    var angle = 0.0;
+    var angleIncrement = Math.round(num_friends / 360.0 * 100) / 100 - .01;
+    console.log(angleIncrement);
 
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
     cylinder.overdraw = true;
     scene.add(cylinder);
 
-    for(var i = 0; i < 11; i++){
+    for(var i = 0; i < num_friends; i++){
       var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
       cylinderChild.overdraw = true;
       cylinder.add(cylinderChild);
-      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 100, 0, 0));
+      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 1000, 0, 0));
       cylinderChild.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
-      angle += 36;
+      angle += angleIncrement;
     }
 
     // renderer
@@ -81,4 +85,3 @@ window.onload = function() {
     requestAnimationFrame( animate );
     controls.update();
   }
-}
