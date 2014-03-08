@@ -6,13 +6,13 @@
   var $network = $('#network');
 
   function setUpWithFriends(friendlist){
-    console.log(friendlist);
     init(friendlist);
     animate();
   }
 
   function init(friendlist) {
-    var num_friends = Object.keys(friendlist).length;
+    var num_friends = 8;
+    //var num_friends = Object.keys(friendlist).length;
     camera = new THREE.PerspectiveCamera( 45, $network.width() / $network.height(), 1, 10000 );
     camera.position.z = 700;
     camera.aspect = WIDTH / HEIGHT;
@@ -37,9 +37,35 @@
     // world
     scene = new THREE.Scene();
 
+    // smooth my curve over this many points
+    var numPoints = 100;
+    var factor = 0.25;
+
+    var spline = new THREE.SplineCurve3([
+       new THREE.Vector3(0, 0, 0),
+       new THREE.Vector3(0, 100*factor, 0),
+       new THREE.Vector3(100*factor, 100*factor, 0),
+       new THREE.Vector3(100*factor, 200*factor, 0),
+       new THREE.Vector3(200*factor, 200*factor, 0),
+       new THREE.Vector3(200*factor, 300*factor, 0),
+       new THREE.Vector3(300*factor, 300*factor, 0),
+       new THREE.Vector3(300*factor, 400*factor, 0),
+       new THREE.Vector3(400*factor, 400*factor, 0)
+    ]);
+
+    var material = new THREE.LineBasicMaterial({
+        color: 0xff00f0,
+    });
+
+    var spline_geometry = new THREE.Geometry();
+    var splinePoints = spline.getPoints(numPoints);
+
+    for(var i = 0; i < splinePoints.length; i++){
+        spline_geometry.vertices.push(splinePoints[i]);  
+    }
+
     var angle = 0.0;
-    var angleIncrement = Math.round(num_friends / 360.0 * 100) / 100 - .01;
-    console.log(angleIncrement);
+    var angleIncrement = Math.round(360.0 / num_friends);
 
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
     cylinder.overdraw = true;
@@ -49,8 +75,14 @@
       var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshNormalMaterial());
       cylinderChild.overdraw = true;
       cylinder.add(cylinderChild);
-      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 1000, 0, 0));
+
+      var line = new THREE.Line(spline_geometry, material);
+      cylinder.add(line);
+      line.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
+      
+      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 100, 0, 0));
       cylinderChild.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
+      console.log(angle);
       angle += angleIncrement;
     }
 
