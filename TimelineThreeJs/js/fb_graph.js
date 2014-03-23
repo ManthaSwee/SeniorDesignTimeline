@@ -47,6 +47,7 @@
             + response.data[i].name + "</span></li>");
         }
         setUpWithFriends(friendlist);
+        generateJSON(friendlist, response);
        });
      }
 
