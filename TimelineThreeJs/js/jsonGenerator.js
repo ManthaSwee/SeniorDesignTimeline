@@ -1,10 +1,10 @@
-function generateJSON(friendlist, response){
+function generateJSON(friendlist, response, callback){
 var names = Object.keys(friendlist);
 
 var jsonArr = [];
 
 
-asyncLoop(names.length, function(loop) {
+asyncLoop(10, function(loop) {
     FB.api('/me/mutualfriends/'+friendlist[names[loop.iteration()]],function(response) {
         var mutual = [];
         for(var j = 0; j < response.data.length; j++){
@@ -16,10 +16,10 @@ asyncLoop(names.length, function(loop) {
         addPerson(loop.iteration(), mutual);
 
         // Okay, for cycle could continue
+        console.log(loop.iteration())
         loop.next();
-        console.log(loop.iteration());
     })},
-    function(){console.log(JSON.stringify(jsonArr, null, 4))}
+    function(){callback(jsonArr)}
 );
 
 function addPerson(i, mutual){
@@ -29,29 +29,29 @@ function addPerson(i, mutual){
         fbid : friendlist[names[i]],
         photo : "https://graph.facebook.com/" + response.data[i].id + "/picture",
         startdate : start,
-        photos : randomPhotos(start),
+        photos : randomPhotos(start, mutual),
         likes : randomLikes(),
         mutualfriends : mutual
     });
 }
 
-function randomPhotos(start){
+function randomPhotos(start, mutual){
     var photos = [];
     for(var i = 0; i < Math.floor((Math.random()*10)); i++){
         photos.push({
                 id : Math.floor((Math.random()*90000)+ 10000),
                 date : randomDate(start, new Date()),
-                tags : randomPeople()
+                tags : randomPeople(mutual)
         });
     }
     return photos;
 }
 
-function randomPeople(){
+function randomPeople(mutual){
     var people = [];
     for(var i = 0; i < Math.floor((Math.random()*5)); i++){
         people.push({
-            name: names[Math.floor((Math.random()*names.length))],
+            name: mutual[Math.floor((Math.random()*mutual.length))],
         });
     }
     return people;

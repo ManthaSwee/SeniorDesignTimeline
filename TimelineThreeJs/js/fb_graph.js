@@ -46,8 +46,7 @@
             + response.data[i].id + "/picture\'/><span><input type=\"checkbox\">"
             + response.data[i].name + "</span></li>");
         }
-        setUpWithFriends(friendlist);
-        generateJSON(friendlist, response);
+        setUpWithFriends(friendlist, response);
        });
      }
 

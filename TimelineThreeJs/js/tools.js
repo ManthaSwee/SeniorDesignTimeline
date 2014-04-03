@@ -5,7 +5,7 @@ $( document ).ready(function() {
     //on button click, set searchbar state
     $("button").click(function(event) {
         var newState = event.target.id;
-        if(newState === state){
+        if(newState === state && newState != 'a'){
             $("#searchbar").toggle();
         } else {
             state = newState;
