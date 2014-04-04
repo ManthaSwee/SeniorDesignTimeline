@@ -39,7 +39,8 @@
 
     function getFriends() {
      FB.api('/me/friends', function(response) {
-        for(var i = 0; i < response.data.length; i++){
+        for(var i = 0; i < 10; i++){
+        //for(var i = 0; i < response.data.length; i++){
           friendlist[response.data[i].name] = response.data[i].id;
           $('#friendlist').append(
             "<li><img class=\'friend\' src=\'https://graph.facebook.com/" 

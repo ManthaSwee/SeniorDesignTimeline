@@ -1,6 +1,7 @@
 $( document ).ready(function() {
     var state = 'b';
     var currentlyCheckedFriends = [];
+    var lastChecked;
 
     //on button click, set searchbar state
     $("button").click(function(event) {
@@ -58,9 +59,17 @@ $( document ).ready(function() {
     //keep track of which friends are checked
     $('#friendlist').on('click', function(){
       var names = [];
+      var nextChecked;
        $('input:checked').each(function() {
-           names.push($(this).parent().text());
+            if($(this).parent().text() != lastChecked){
+                names.push($(this).parent().text());
+                selectObjectViaList($(this).parent().text());
+                nextChecked = $(this).parent().text();
+            } else {
+                $(this).attr('checked', false);
+            }
      });
+       lastChecked = nextChecked;
        currentlyCheckedFriends = names;
     });
 

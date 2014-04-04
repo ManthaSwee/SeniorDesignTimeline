@@ -1,23 +1,21 @@
-  if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-  function setUpWithFriends(friendlist, response){
-    init(friendlist, response);
-  }
-
-  function init(friendlist, response) {
-    generateJSON(friendlist, response, function(json){
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       // standard global variables
       var camera, controls, scene, renderer;
 
       // custom global variables
-      var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
+      var projector, mouse = { x: 0, y: 0 }, INTERSECTED, INTERSECTED_SELECTED;
       var sprite1;
       var canvas1, context1, texture1;
 
       var WIDTH = window.innerWidth;
       var HEIGHT = (window.innerHeight - 175) + 2;
       var $network = $('#network');
+  function setUpWithFriends(friendlist, response){
+    init(friendlist, response);
+  }
 
+  function init(friendlist, response) {
+    generateJSON(friendlist, response, function(json){
       //SCENE
       scene = new THREE.Scene();
       //console.log(json);
@@ -40,7 +38,6 @@
 
       //PROJECTOR
       projector = new THREE.Projector();
-      document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
       //CANVAS ELEMENT
       canvas1 = document.createElement('canvas');
@@ -50,7 +47,7 @@
       context1.fillText('Hello, world!', 0, 20);
       
       // canvas contents will be used for a texture
-      texture1 = new THREE.Texture(canvas1) 
+      texture1 = new THREE.Texture(canvas1);
       texture1.needsUpdate = true;
       
       var spriteMaterial = new THREE.SpriteMaterial( { map: texture1, useScreenCoordinates: true} );
@@ -90,13 +87,13 @@
       var angle = 0.0;
       var angleIncrement = Math.round(360.0 / num_friends);
 
-      var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x000088 }));
+      var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x63ad44 }));
       cylinder.overdraw = true;
       scene.add(cylinder);
 
       //CYLINDER CHILD
       for(var i = 0; i < num_friends; i++){
-        var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x00f088 }));
+        var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x9b59b6 }));
         cylinderChild.overdraw = true;
         cylinderChild.person = json[i];
         cylinderChild.name = json[i].name;
@@ -117,27 +114,73 @@
        canvas: document.getElementById('network'),
        antialias: true } );
       renderer.setSize( WIDTH, HEIGHT );
-      renderer.setClearColor( 0xffffff, 1);
+      renderer.setClearColor( 0xbdc3c7, 1);
       container.appendChild( renderer.domElement );
       window.addEventListener( 'resize', onWindowResize, false );
+      renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+      renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+      animate();
+    });
+  }
 
       function render() {
         renderer.render( scene, camera );
       }
       
-      function onDocumentMouseMove( event ) 
-      {
-          // the following line would stop any other event handler from firing
-          // (such as the mouse's TrackballControls)
+      function onDocumentMouseMove( event ) {
+          // the following line would stop any other event handler from firing (such as the mouse's TrackballControls)
           // event.preventDefault();
 
-          // update sprite position
-          sprite1.position.set( event.clientX-500, event.clientY - 20, 0 );
-          //sprite1.position.set( 0, 0, 0 );
-          
-          // update the mouse variable
+          sprite1.position.set( 0, 0, 0 );
           mouse.x = ( event.clientX / WIDTH ) * 2 - 1;
           mouse.y = - ( event.clientY / HEIGHT ) * 2 + 1;
+      }
+
+      function onDocumentMouseDown( event ) {
+        var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+        projector.unprojectVector( vector, camera );
+        
+        var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+        var intersects = ray.intersectObjects( scene.children[1].children );
+
+        if ( intersects.length > 0 ) {
+            // if the closest object intersected is not the currently stored intersection object
+            if ( intersects[ 0 ].object != INTERSECTED_SELECTED ) {
+                // restore previous intersection object (if it exists) to its original color
+                if ( INTERSECTED_SELECTED ) {
+                    INTERSECTED_SELECTED.material.color.setHex( INTERSECTED_SELECTED.currentHex );
+                }
+                // store reference to closest object as current intersection object
+                INTERSECTED_SELECTED = intersects[ 0 ].object;
+                // set a new color for closest object
+                INTERSECTED_SELECTED.material.color.setHex( 0x5944ad );
+            }
+            else {
+                INTERSECTED_SELECTED.material.color.setHex( INTERSECTED_SELECTED.currentHex );
+                INTERSECTED_SELECTED = null;
+                update();
+            }
+        } 
+        controls.update();
+      }
+
+      function selectObjectViaList( name ) {
+        // restore previous intersection object (if it exists) to its original color
+        if ( INTERSECTED_SELECTED ) {
+            INTERSECTED_SELECTED.material.color.setHex( INTERSECTED_SELECTED.currentHex );
+        }
+        for(var i = 0; i < scene.children[1].children.length; i++){
+          if(name === scene.children[1].children[i].person.name){
+            INTERSECTED_SELECTED = scene.children[1].children[i];
+            INTERSECTED_SELECTED.currentHex = INTERSECTED_SELECTED.material.color.getHex();
+            INTERSECTED_SELECTED.material.color.setHex( 0x5944ad );
+          }
+        }
+        // store reference to closest object as current intersection object
+        //INTERSECTED_SELECTED = intersects[ 0 ].object;
+        // set a new color for closest object
+        //INTERSECTED_SELECTED.material.color.setHex( 0x3c3c3c );
       }
 
       function onWindowResize() {
@@ -150,42 +193,45 @@
 
         render();
       }
-    function update()
-    {
-        position = camera.position;
-        // create a Ray with origin at the mouse position
-        //   and direction into the scene (camera direction)
-        var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-        projector.unprojectVector( vector, camera );
-        
 
-        var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+      function animate() {
+        requestAnimationFrame( animate );
+        render();
+        controls.update();       
+        update();
+      }
 
-        // create an array containing all objects in the scene with which the ray intersects
-        var intersects = ray.intersectObjects( scene.children[1].children );
-        // INTERSECTED = the object in the scene currently closest to the camera 
-        //      and intersected by the Ray projected from the mouse position    
+      function update() {
+          // create a Ray with origin at the mouse position
+          //   and direction into the scene (camera direction)
+          var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+          projector.unprojectVector( vector, camera );
+          
+          var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+          // create an array containing all objects in the scene with which the ray intersects
+          var intersects = ray.intersectObjects( scene.children[1].children );
+          // INTERSECTED = the object in the scene currently closest to the camera 
+          //      and intersected by the Ray projected from the mouse position    
         
-        // if there is one (or more) intersections
-        if ( intersects.length > 0 )
-        {
-            // if the closest object intersected is not the currently stored intersection object
-            if ( intersects[ 0 ].object != INTERSECTED ) 
-            {
+          // if there is one (or more) intersections
+          if ( intersects.length > 0 ) {
+              // if the closest object intersected is not the currently stored intersection object
+              if ( intersects[ 0 ].object != INTERSECTED) {
                 // restore previous intersection object (if it exists) to its original color
-                if ( INTERSECTED ) {
+                if ( INTERSECTED  && INTERSECTED != INTERSECTED_SELECTED) {
                     INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
                 }
                 // store reference to closest object as current intersection object
                 INTERSECTED = intersects[ 0 ].object;
                 // store color of closest object (for later restoration)
-                INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-                // set a new color for closest object
-                INTERSECTED.material.color.setHex( 0xffff00 );
-                
+                if( INTERSECTED != INTERSECTED_SELECTED) {
+                  INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+                  // set a new color for closest object
+                  INTERSECTED.material.color.setHex( 0xad4498 );
+                }
                 // update text, if it has a "name" field.
-                if ( intersects[ 0 ].object.name )
-                {
+                if ( intersects[ 0 ].object.name ) {
                     context1.clearRect(0,0,640,480);
                     var message = intersects[ 0 ].object.name;
                     var metrics = context1.measureText(message);
@@ -198,34 +244,24 @@
                     context1.fillText( message, 4,20 );
                     texture1.needsUpdate = true;
                 }
-                else
-                {
+                else {
                     context1.clearRect(0,0,300,300);
                     texture1.needsUpdate = true;
                 }
+            } else if (INTERSECTED != INTERSECTED_SELECTED) {
+              INTERSECTED.material.color.setHex( 0xad4498 );
             }
-        } 
-        else // there are no intersections
-        {
-            // restore previous intersection object (if it exists) to its original color
-            if ( INTERSECTED ) 
-                INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-            // remove previous intersection object reference
-            //     by setting current intersection object to "nothing"
-            INTERSECTED = null;
-            context1.clearRect(0,0,300,300);
-            texture1.needsUpdate = true;
-        }
-
-        controls.update();
-    }
-
-          function animate() {
-            requestAnimationFrame( animate );
-            render();
-            controls.update();       
-            update();
+          } 
+          // there are no intersections 
+          else{
+               // restore previous intersection object (if it exists) to its original color
+             if ( INTERSECTED &&  INTERSECTED != INTERSECTED_SELECTED) 
+                  INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+              // remove previous intersection object reference
+              //     by setting current intersection object to "nothing"
+              INTERSECTED = null;
+              context1.clearRect(0,0,300,300);
+              texture1.needsUpdate = true;
           }
-            animate();
-    });
-  }
+        controls.update();
+      }
