@@ -155,3 +155,15 @@ li span {
     top: -15px;
     position: relative;
 }
+
+#selected_info {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 250px;
+    background-color: #34495e;
+    border: 8px solid #2c3e50;
+    color: white;
+    overflow: scroll;
+}

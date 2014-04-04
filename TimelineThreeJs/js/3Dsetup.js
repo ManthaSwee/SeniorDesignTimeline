@@ -86,7 +86,6 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       //ORIGIN CYLINDER SET UP
       var angle = 0.0;
       var angleIncrement = Math.round(360.0 / num_friends);
-
       var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x63ad44 }));
       cylinder.overdraw = true;
       scene.add(cylinder);
@@ -138,6 +137,7 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       }
 
       function onDocumentMouseDown( event ) {
+        console.log(camera);
         var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
         projector.unprojectVector( vector, camera );
         
@@ -155,6 +155,7 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
                 INTERSECTED_SELECTED = intersects[ 0 ].object;
                 // set a new color for closest object
                 INTERSECTED_SELECTED.material.color.setHex( 0x5944ad );
+                updateSelectedInfo();
             }
             else {
                 INTERSECTED_SELECTED.material.color.setHex( INTERSECTED_SELECTED.currentHex );
@@ -177,10 +178,40 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
             INTERSECTED_SELECTED.material.color.setHex( 0x5944ad );
           }
         }
+        updateSelectedInfo();
         // store reference to closest object as current intersection object
         //INTERSECTED_SELECTED = intersects[ 0 ].object;
         // set a new color for closest object
         //INTERSECTED_SELECTED.material.color.setHex( 0x3c3c3c );
+      }
+
+      function updateSelectedInfo(){
+        console.log(INTERSECTED_SELECTED);
+        var $selected = $('#selected_info');
+        $selected.empty();
+        $selected.append("name : " + INTERSECTED_SELECTED.person.name);
+        $selected.append("<br>");
+        $selected.append("fbid : " + INTERSECTED_SELECTED.person.fbid);
+        $selected.append("<br>");
+        $selected.append("likes : " + INTERSECTED_SELECTED.person.likes);
+        $selected.append("<br>");
+        $selected.append("photo : " + INTERSECTED_SELECTED.person.photo);
+        $selected.append("<br>");
+        $selected.append("likes : " + INTERSECTED_SELECTED.person.startdate);
+        $selected.append("<br>mutual friends : <br>");
+        for(var i = 0; i < INTERSECTED_SELECTED.person.mutualfriends.length; i++){
+          $selected.append("&nbsp;&nbsp;&nbsp;&nbsp;" + INTERSECTED_SELECTED.person.mutualfriends[i].name + " , " + INTERSECTED_SELECTED.person.mutualfriends[i].id + "<br>");
+        }
+        $selected.append("photos : <br>");
+        for(var k = 0; k < INTERSECTED_SELECTED.person.photos.length; k++){
+          $selected.append("&nbsp;&nbsp;&nbsp;&nbsp;" + INTERSECTED_SELECTED.person.photos[k].date + "<br>");
+          $selected.append("&nbsp;&nbsp;&nbsp;&nbsp;" + INTERSECTED_SELECTED.person.photos[k].id + "<br>");
+          console.log(INTERSECTED_SELECTED.person.photos[k].tags.length);
+          for(var j = 0; j < INTERSECTED_SELECTED.person.photos[k].tags.length; j++){
+            // console.log(INTERSECTED_SELECTED.person.photos[k].tags[j].name);
+            $selected.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + INTERSECTED_SELECTED.person.photos[k].tags[j].name.name + "<br>");
+          }
+        }
       }
 
       function onWindowResize() {
@@ -197,7 +228,7 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       function animate() {
         requestAnimationFrame( animate );
         render();
-        controls.update();       
+        controls.update();     
         update();
       }
 
