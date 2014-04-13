@@ -1,10 +1,10 @@
-function generateJSON(friendlist, response, callback){
+function generateJSON(friendlist, user, response, callback){
 var names = Object.keys(friendlist);
-
+console.log(user);
 var jsonArr = [];
 
-
-asyncLoop(10, function(loop) {
+// asyncLoop(friendlist.length, function(loop) {
+asyncLoop(1, function(loop) {
     FB.api('/me/mutualfriends/'+friendlist[names[loop.iteration()]],function(response) {
         var mutual = [];
         for(var j = 0; j < response.data.length; j++){
@@ -13,7 +13,12 @@ asyncLoop(10, function(loop) {
                 id : response.data[j].id
             });
         }
-        addPerson(loop.iteration(), mutual);
+
+        jsonArr.push({
+            name : user.name,
+            joined_date : new Date(2008, 0, 1),
+            friend : addPerson(loop.iteration(), mutual)
+        });
 
         // Okay, for cycle could continue
         console.log(loop.iteration())
@@ -23,16 +28,19 @@ asyncLoop(10, function(loop) {
 );
 
 function addPerson(i, mutual){
+    var person = [];
     var start = randomDate(new Date(2008, 0, 1), new Date());
-    jsonArr.push({
+    person.push({
         name : names[i],
         fbid : friendlist[names[i]],
         photo : "https://graph.facebook.com/" + response.data[i].id + "/picture",
         startdate : start,
-        photos : randomPhotos(start, mutual),
+        //photos : randomPhotos(start, mutual),
         likes : randomLikes(),
-        mutualfriends : mutual
+        //mutualfriends : mutual
+        interactions : randomInteractions(start, new Date())
     });
+    return person;
 }
 
 function randomPhotos(start, mutual){
@@ -45,6 +53,21 @@ function randomPhotos(start, mutual){
         });
     }
     return photos;
+}
+
+function randomInteractions(start, end){
+    var interactions = [];
+    var types = ['message', 'wall post'];
+    var range = [200, 5]
+    for(var i = 0; i < Math.floor((Math.random()*8)); i++){
+        var randomInt = Math.floor((Math.random()*types.length));
+        interactions.push({
+                type : types[randomInt],
+                date : "date here",
+                count : Math.floor((Math.random()*range[randomInt])+1)
+        });
+    }
+    return interactions;
 }
 
 function randomPeople(mutual){

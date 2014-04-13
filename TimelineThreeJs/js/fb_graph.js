@@ -30,14 +30,14 @@
       FB.api('/me', function(response) {
         console.log('Good to see you, ' + response.name + '.');
         if(!photoDisplayed){
-          getFriends();
+          getFriends(response);
           getProfilePicture(response.id);
           photoDisplayed = true;
         }
       });
     }
 
-    function getFriends() {
+    function getFriends(user) {
      FB.api('/me/friends', function(response) {
         for(var i = 0; i < 10; i++){
         //for(var i = 0; i < response.data.length; i++){
@@ -47,7 +47,7 @@
             + response.data[i].id + "/picture\'/><span><input type=\"checkbox\">"
             + response.data[i].name + "</span></li>");
         }
-        setUpWithFriends(friendlist, response);
+        setUpWithFriends(friendlist, user, response);
        });
      }
 

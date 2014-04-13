@@ -10,16 +10,20 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       var WIDTH = window.innerWidth;
       var HEIGHT = (window.innerHeight - 175) + 2;
       var $network = $('#network');
-  function setUpWithFriends(friendlist, response){
-    init(friendlist, response);
+
+  function setUpWithFriends(friendlist, user, response){
+    init(friendlist, user, response);
   }
 
-  function init(friendlist, response) {
-    generateJSON(friendlist, response, function(json){
+  function init(friendlist, user, response) {
+    generateJSON(friendlist, user, response, function(json){
+
+      console.log(JSON.stringify(json, undefined, 4));
+      console.log(json);
+      
       //SCENE
       scene = new THREE.Scene();
-      //console.log(json);
-      var num_friends = 10;
+      var num_friends = 1;
       //var num_friends = Object.keys(friendlist).length;
 
       //CAMERA
@@ -57,31 +61,31 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       scene.add( sprite1 );   
 
       //SPLINE
-      var numPoints = 100;
-      var factor = 0.25;
+      // var numPoints = 100;
+      // var factor = 0.25;
 
-      var spline = new THREE.SplineCurve3([
-         new THREE.Vector3(0, 0, 0),
-         new THREE.Vector3(0, 100*factor, 0),
-         new THREE.Vector3(100*factor, 100*factor, 0),
-         new THREE.Vector3(100*factor, 200*factor, 0),
-         new THREE.Vector3(200*factor, 200*factor, 0),
-         new THREE.Vector3(200*factor, 300*factor, 0),
-         new THREE.Vector3(300*factor, 300*factor, 0),
-         new THREE.Vector3(300*factor, 400*factor, 0),
-         new THREE.Vector3(400*factor, 400*factor, 0)
-      ]);
+      // var spline = new THREE.SplineCurve3([
+      //    new THREE.Vector3(0, 0, 0),
+      //    new THREE.Vector3(0, 100*factor, 0),
+      //    new THREE.Vector3(100*factor, 100*factor, 0),
+      //    new THREE.Vector3(100*factor, 200*factor, 0),
+      //    new THREE.Vector3(200*factor, 200*factor, 0),
+      //    new THREE.Vector3(200*factor, 300*factor, 0),
+      //    new THREE.Vector3(300*factor, 300*factor, 0),
+      //    new THREE.Vector3(300*factor, 400*factor, 0),
+      //    new THREE.Vector3(400*factor, 400*factor, 0)
+      // ]);
 
-      var material = new THREE.LineBasicMaterial({
-          color: 0xff00f0,
-      });
+      // var material = new THREE.LineBasicMaterial({
+      //     color: 0xff00f0,
+      // });
 
-      var spline_geometry = new THREE.Geometry();
-      var splinePoints = spline.getPoints(numPoints);
+      // var spline_geometry = new THREE.Geometry();
+      // var splinePoints = spline.getPoints(numPoints);
 
-      for(var i = 0; i < splinePoints.length; i++){
-          spline_geometry.vertices.push(splinePoints[i]);  
-      }
+      // for(var i = 0; i < splinePoints.length; i++){
+      //     spline_geometry.vertices.push(splinePoints[i]);  
+      // }
 
       //ORIGIN CYLINDER SET UP
       var angle = 0.0;
@@ -92,10 +96,17 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
       //CYLINDER CHILD
       for(var i = 0; i < num_friends; i++){
-        var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x9b59b6 }));
+        var known_friend_since = Date.daysBetween(json[i].joined_date, new Date(json[i].friend[0].startdate));
+        var been_member_since = Date.daysBetween(json[i].joined_date, new Date());
+        var percentage = known_friend_since / been_member_since;
+        console.log(Date.daysBetween(json[i].joined_date, new Date(json[i].friend[0].startdate)));
+        console.log(Date.daysBetween(json[i].joined_date, new Date()));
+        console.log(percentage);
+
+        var cylinderChild = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, percentage*400, 20, 20, false), new THREE.MeshBasicMaterial( { color: 0x9b59b6 }));
         cylinderChild.overdraw = true;
-        cylinderChild.person = json[i];
-        cylinderChild.name = json[i].name;
+        cylinderChild.person = json[i].friend;
+        cylinderChild.name = json[i].friend.name;
         cylinder.add(cylinderChild);
 
         //var line = new THREE.Line(spline_geometry, material);
@@ -230,6 +241,21 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
         render();
         controls.update();     
         update();
+      }
+
+      Date.daysBetween = function( date1, date2 ) {
+        //Get 1 day in milliseconds
+        var one_day=1000*60*60*24;
+
+        // Convert both dates to milliseconds
+        var date1_ms = date1.getTime();
+        var date2_ms = date2.getTime();
+
+        // Calculate the difference in milliseconds
+        var difference_ms = date2_ms - date1_ms;
+          
+        // Convert back to days and return
+        return Math.round(difference_ms/one_day); 
       }
 
       function update() {
