@@ -8,8 +8,10 @@
       if (response.status === 'connected') {
         testAPI();
       } else if (response.status === 'not_authorized') {
+        console.log("You are not authorized.");
         FB.login();
       } else {
+        console.log("You are not authorized.");
         FB.login();
       }
     });

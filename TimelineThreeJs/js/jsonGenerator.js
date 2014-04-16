@@ -35,9 +35,9 @@ function addPerson(i, mutual){
         fbid : friendlist[names[i]],
         photo : "https://graph.facebook.com/" + response.data[i].id + "/picture",
         startdate : start,
-        //photos : randomPhotos(start, mutual),
+        photos : randomPhotos(start, mutual),
         likes : randomLikes(),
-        //mutualfriends : mutual
+        mutualfriends : mutual,
         interactions : randomInteractions(start, new Date())
     });
     return person;
@@ -58,8 +58,8 @@ function randomPhotos(start, mutual){
 function randomInteractions(start, end){
     var interactions = [];
     var types = ['message', 'wall post'];
-    var range = [200, 5]
-    for(var i = 0; i < Math.floor((Math.random()*8)); i++){
+    var range = [200, 5];
+    for(var i = 0; i < Math.floor((Math.random()*10)); i++){
         var randomInt = Math.floor((Math.random()*types.length));
         interactions.push({
                 type : types[randomInt],
