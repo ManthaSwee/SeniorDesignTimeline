@@ -7,7 +7,8 @@
     <script src="js/trackballControls.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/tools.js"></script>
-    <script src="js/3DSetup.js"></script>
+    <script src="js/3DSetup_extrude.js"></script>
+    <script src="js/3D_functions.js"></script>
     <script src="js/jsonGenerator.js"></script>
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -31,7 +32,7 @@
       <div id="user">
         <img style="z-index:1; position: absolute; top: 0" src="images/user_photo_background.png"/>
         <div id="user-info">
-          *user info*
+          <input id="animation" type="button" onclick="animateCamera(true)" value="Camera Spline Animation View: OFF"/>
         </div>
       </div>
       <div id="viewport">

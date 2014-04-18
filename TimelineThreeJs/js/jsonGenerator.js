@@ -1,7 +1,11 @@
 function generateJSON(friendlist, user, response, callback){
 var names = Object.keys(friendlist);
-console.log(user);
 var jsonArr = [];
+
+        jsonArr.push({
+            name : user.name,
+            joined_date : new Date(2008, 0, 1)
+        });
 
 // asyncLoop(friendlist.length, function(loop) {
 asyncLoop(1, function(loop) {
@@ -15,8 +19,6 @@ asyncLoop(1, function(loop) {
         }
 
         jsonArr.push({
-            name : user.name,
-            joined_date : new Date(2008, 0, 1),
             friend : addPerson(loop.iteration(), mutual)
         });
 
@@ -61,11 +63,13 @@ function randomInteractions(start, end){
     var range = [200, 5];
     for(var i = 0; i < Math.floor((Math.random()*10)); i++){
         var randomInt = Math.floor((Math.random()*types.length));
+        var date = randomDate(start, end);
         interactions.push({
                 type : types[randomInt],
-                date : "date here",
+                date : date,
                 count : Math.floor((Math.random()*range[randomInt])+1)
         });
+        start = date;
     }
     return interactions;
 }

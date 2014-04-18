@@ -109,7 +109,7 @@ function init(friendlist, user, response) {
       //cylinder.add(line);
       //line.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
         
-      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 100, 0, 0));
+      cylinderChild.applyMatrix( new THREE.Matrix4().makeTranslation( 100, -(400 - percentage*400)/2, 0));
       cylinderChild.applyMatrix( new THREE.Matrix4().makeRotationY(angle));
       angle += angleIncrement;
     }
